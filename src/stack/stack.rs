@@ -1,38 +1,38 @@
 
 #[derive(Debug)]
-struct Stack<T> {
+pub struct Stack<T> {
     size: usize,
     data: Vec<T>
 }
 
 
 impl<T> Stack<T> {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             size: 0,
             data: Vec::new()
         }
     }
 
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         0 == self.size
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.size
     }
 
-    fn clear(&mut self) {
+    pub fn clear(&mut self) {
         self.size = 0;
         self.data.clear();
     }
 
-    fn push(&mut self, val: T) {
+    pub fn push(&mut self, val: T) {
         self.data.push(val);
         self.size += 1;
     }
 
-    fn pop(&mut self) -> Option<T> {
+    pub fn pop(&mut self) -> Option<T> {
         if self.size == 0 {
             return None;
         }
@@ -40,14 +40,14 @@ impl<T> Stack<T> {
         self.data.pop()
     }
 
-    fn peek(&self) -> Option<&T> {
+    pub fn peek(&self) -> Option<&T> {
         if self.size == 0 {
             return None;
         }
         self.data.get(self.size - 1)
     }
 
-    fn peek_mut(&mut self) -> Option<&mut T> {
+    pub fn peek_mut(&mut self) -> Option<&mut T> {
         if self.size == 0 {
             return None;
         }
@@ -55,11 +55,11 @@ impl<T> Stack<T> {
     }
 
     // 这里的 IntoIter 是定义结构
-    fn into_iter(self) -> IntoIter<T> {
+    pub fn into_iter(self) -> IntoIter<T> {
         IntoIter(self)
     }
 
-    fn iter(&self) -> Iter<T> {
+    pub fn iter(&self) -> Iter<T> {
         let mut iterator = Iter { stack: Stack { size: 0, data: vec![] } };
         for item in self.data.iter() {
             iterator.stack.push(item);
@@ -67,7 +67,7 @@ impl<T> Stack<T> {
         iterator
     }
 
-    fn iter_mut(&mut self) -> IterMut<T> {
+    pub fn iter_mut(&mut self) -> IterMut<T> {
         let mut iterator = IterMut { stack: Vec::new() };
         for item in self.data.iter_mut() {
             iterator.stack.push(item);
@@ -77,7 +77,7 @@ impl<T> Stack<T> {
 
 }
 
-struct IntoIter<T>(Stack<T>);
+pub struct IntoIter<T>(Stack<T>);
 impl<T: Clone> Iterator for IntoIter<T> {
     type Item = T;
 
@@ -92,7 +92,7 @@ impl<T: Clone> Iterator for IntoIter<T> {
 }
 
 // 可以换成 stack: Stack<&'a T>，初始化的时候麻烦些
-struct Iter<'a, T: 'a> {
+pub struct Iter<'a, T: 'a> {
     // stack: Vec<&'a T>,
     stack: Stack<&'a T>
 }
@@ -104,7 +104,7 @@ impl<'a, T> Iterator for Iter<'a, T> {
     }
 }
 
-struct IterMut<'a, T: 'a> {
+pub struct IterMut<'a, T: 'a> {
     stack: Vec<&'a mut T>
 }
 impl<'a, T> Iterator for IterMut<'a, T> {
@@ -128,6 +128,8 @@ mod tests {
         s.push(3);
 
         println!("size: {}, {:?}", s.len(), s);
+        println!("pop: {}, size: {:?}", s.pop().unwrap(), s.len());
+        println!("empty: {}, {:?}", s.is_empty(), s);
 
         s.clear();
         println!("{:?}", s);
