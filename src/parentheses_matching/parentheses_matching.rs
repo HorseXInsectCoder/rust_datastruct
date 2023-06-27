@@ -77,7 +77,6 @@ pub fn par_checker3(par: &str) -> bool {
     for c in par.chars() {
         char_list.push(c);
     }
-
     let mut index = 0;
     let mut balance = true;
     let mut stack = Stack::new();
@@ -87,8 +86,7 @@ pub fn par_checker3(par: &str) -> bool {
         if '(' == c || '[' == c || '{' == c {
             stack.push(c);
         }
-        // 如果是右括号，则判断是否平衡
-        if ')' == c || ']' == c || '}' == c{
+        if ')' == c || ']' == c || '}' == c {
             if stack.is_empty() {
                 balance = false;
             } else {
@@ -100,7 +98,7 @@ pub fn par_checker3(par: &str) -> bool {
         }
         index += 1;
     }
-    balance && stack.is_empty()
+    stack.is_empty() && balance
 }
 
 #[cfg(test)]
@@ -140,5 +138,9 @@ mod tests {
         let res2 = par_checker3(sb);
         let res3 = par_checker3(sc);
         println!("{sa} balanced: {res1}, {sb} balanced: {res2}, {sc} balance: {res3}");
+
+        assert_eq!(res1, true);
+        assert_eq!(res2, false);
+        assert_eq!(res3, true);
     }
 }
