@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use crate::parentheses_matching::parentheses_matching::par_checker3;
 use crate::stack::stack::Stack;
 
@@ -62,6 +62,46 @@ fn infix_to_suffix(infix: &str) -> Option<String> {
     Some(suffix_str)
 }
 
+fn suffix_eval(suffix: &str) -> Option<i32> {
+    // 后缀表达式至少需要两个操作数和一个运算符，另外还需要两个空格把它们隔开，所以至少是5个字符
+    if suffix.len() < 5 {
+        return None;
+    }
+
+    let mut ops = Stack::new();
+    for token in suffix.split_whitespace() {
+        if "0" <= token && token <= "9" {
+            ops.push(token.parse::<i32>().unwrap());
+        } else {
+            // 对于减法和除法，有顺序要求
+            // 先出栈的是第二个操作数
+            let op2 = ops.pop().unwrap();
+            let op1 = ops.pop().unwrap();
+            let res = do_calc(token, op1, op2);
+            ops.push(res);
+        }
+    }
+
+    Some(ops.pop().unwrap())
+}
+
+fn do_calc(op: &str, op1: i32, op2: i32) -> i32 {
+    if "+" == op {
+        op1 + op2
+    } else if "-" == op {
+        op1 - op2
+    } else if "*" == op {
+        op1 * op2
+    } else if "/" == op {
+        if 0 == op2 {
+            panic!("ZeroDivisionError: Invalid operation!");
+        }
+        op1 / op2
+    } else {
+        panic!("OperatorError: Invalid operator: {:?}", op);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -73,6 +113,23 @@ mod tests {
         match suffix {
             Some(val) => println!("{infix} -> {val}"),
             None => println!("{infix} isn't a correct infix string"),
+        }
+
+        let infix2 = "A + B * C + D";
+        let suffix2 = infix_to_suffix(infix);
+        match suffix2 {
+            Some(val) => println!("{infix2} -> {val}"),
+            None => println!("{infix2} isn't a correct infix string"),
+        }
+    }
+
+    #[test]
+    fn suffix_eval_test() {
+        let suffix = "1 2 + 1 2 + *";
+        let res = suffix_eval(suffix);
+        match res {
+            Some(val) => println!("res = {val}"),
+            None => println!("{suffix} isn't a valid suffix"),
         }
     }
 }
