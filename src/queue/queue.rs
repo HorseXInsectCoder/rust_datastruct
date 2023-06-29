@@ -1,32 +1,32 @@
 
 #[derive(Debug)]
-struct Queue<T> {
-    cap: usize,
-    data: Vec<T>,
+pub struct Queue<T> {
+    pub cap: usize,
+    pub data: Vec<T>,
 }
 
 impl<T> Queue<T> {
-    fn new(size: usize) -> Self {
+    pub fn new(size: usize) -> Self {
         Self {
             cap: size,
             data: Vec::with_capacity(size),
         }
     }
 
-    fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.data.len()
     }
 
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
-    fn is_full(&self) -> bool {
+    pub fn is_full(&self) -> bool {
         self.len() == self.cap
     }
 
     // 入队：先判断是否有剩余空间，如果有的话，就将数据添加到队列中
-    fn enqueue(&mut self, val: T) -> Result<(), String> {
+    pub fn enqueue(&mut self, val: T) -> Result<(), String> {
         if self.len() == self.cap {
             return Err("No space available".to_string())
         }
@@ -36,7 +36,7 @@ impl<T> Queue<T> {
         Ok(())
     }
 
-    fn dequeue(&mut self) -> Option<T> {
+    pub fn dequeue(&mut self) -> Option<T> {
         if self.len() > 0 {
             self.data.pop()
         } else {
@@ -44,15 +44,15 @@ impl<T> Queue<T> {
         }
     }
 
-    fn clear(&mut self) {
+    pub fn clear(&mut self) {
         self.data = Vec::with_capacity(self.cap);
     }
 
-    fn into_iter(self) -> IntoIter<T> {
+    pub fn into_iter(self) -> IntoIter<T> {
         IntoIter(self)
     }
 
-    fn iter(&self) -> Iter<T> {
+    pub fn iter(&self) -> Iter<T> {
         let mut iterator = Iter {
             data: Vec::new()
         };
@@ -62,7 +62,7 @@ impl<T> Queue<T> {
         iterator
     }
 
-    fn iter_mut(&mut self) -> IterMut<T> {
+    pub fn iter_mut(&mut self) -> IterMut<T> {
         let mut iterator = IterMut {
             data: vec![]
         };
@@ -73,7 +73,7 @@ impl<T> Queue<T> {
     }
 }
 
-struct IntoIter<T>(Queue<T>);
+pub struct IntoIter<T>(Queue<T>);
 
 impl<T> Iterator for IntoIter<T> {
     type Item = T;
@@ -88,7 +88,7 @@ impl<T> Iterator for IntoIter<T> {
     }
 }
 
-struct Iter<'a, T> {
+pub struct Iter<'a, T> {
     data: Vec<&'a T>
 }
 
@@ -104,7 +104,7 @@ impl<'a, T> Iterator for Iter<'a, T> {
     }
 }
 
-struct IterMut<'a, T> {
+pub struct IterMut<'a, T> {
     data: Vec<&'a mut T>
 }
 

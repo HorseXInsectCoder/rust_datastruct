@@ -1,6 +1,6 @@
 use std::collections::{HashMap, VecDeque};
 use std::ops::Index;
-use crate::parentheses_matching::parentheses_matching::par_checker3;
+use crate::stack::parentheses_matching::parentheses_matching::par_checker3;
 use crate::stack::stack::Stack;
 
 fn infix_to_suffix(infix: &str) -> Option<String> {
