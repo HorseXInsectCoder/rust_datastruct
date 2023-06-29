@@ -1,4 +1,5 @@
 use std::collections::{HashMap, VecDeque};
+use std::ops::Index;
 use crate::parentheses_matching::parentheses_matching::par_checker3;
 use crate::stack::stack::Stack;
 
@@ -102,6 +103,74 @@ fn do_calc(op: &str, op1: i32, op2: i32) -> i32 {
     }
 }
 
+// todo unfinished
+fn infix_to_prefix(infix: &str) -> Option<String> {
+    // 括号匹配校验
+    if !par_checker3(infix) {
+        return None;
+    }
+
+    // 设置各个运算符的优先级
+    let mut op_priority = HashMap::new();
+    op_priority.insert("(", 1);
+    op_priority.insert(")", 1);
+    op_priority.insert("+", 2);
+    op_priority.insert("-", 2);
+    op_priority.insert("*", 3);
+    op_priority.insert("/", 3);
+
+    // ops是一个栈，用于保存运算符
+    // suffix用于保存后缀表达式
+    let mut ops = Stack::new();
+    let mut prefix = VecDeque::new();
+    let mut i = 0;
+
+    for token in infix.split_whitespace() {
+        // 将数字 0-9 和大写字母 A-Z 入栈
+        if ("A" <= token && token <= "Z") || ("0" <= token && token <= "9") {
+            prefix.push_back(token);
+        } else if "(" == token {
+            ops.push(token);
+        } else if ")" == token {
+            let mut top = ops.pop().unwrap();
+            while top != "(" {
+                prefix.push_front(top);
+                top = ops.pop().unwrap();
+            }
+        } else {
+            while !ops.is_empty() && (op_priority[ops.peek().unwrap()] >= op_priority[token]) {
+                println!("loc: {}", prefix.len() - 1);
+                prefix.insert(prefix.len() - 1, token);
+            }
+
+            // if !ops.is_empty() && *ops.peek().unwrap() == "(" {
+            //     prefix.insert(prefix.len() - 1, token);
+            // }
+
+            ops.push(token);
+            i += 1;
+        }
+        println!("当前操作的token: {}", token);
+        println!("当前ops栈的元素: {:?}", ops);
+        println!("当前prefix列表的元素: {:?}", prefix);
+        println!("===============")
+    }
+
+    // 将栈里剩下的操作数放入列表
+    while !ops.is_empty() {
+        prefix.push_front(ops.pop().unwrap());
+    }
+
+    // 列表中已经是完整的后缀表达式，拼接成字符串
+    let mut suffix_str = String::new();
+    for c in prefix {
+        suffix_str += &c.to_string();
+        suffix_str += " ";
+    }
+
+    Some(suffix_str)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -131,5 +200,22 @@ mod tests {
             Some(val) => println!("res = {val}"),
             None => println!("{suffix} isn't a valid suffix"),
         }
+    }
+
+    #[test]
+    fn prefix_test() {
+        let infix = "( A + B ) * ( C + D )";
+        let prefix = infix_to_prefix(infix);
+        match prefix {
+            Some(val) => println!("{infix} -> {val}"),
+            None => println!("{infix} isn't a correct infix string"),
+        }
+
+        // let infix2 = "A + B * C + D";
+        // let prefix2 = infix_to_prefix(infix);
+        // match prefix2 {
+        //     Some(val) => println!("{infix2} -> {val}"),
+        //     None => println!("{infix2} isn't a correct infix string"),
+        // }
     }
 }
