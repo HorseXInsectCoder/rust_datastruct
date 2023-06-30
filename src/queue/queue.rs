@@ -138,7 +138,7 @@ mod tests {
         assert!(q.enqueue(5).is_err());
 
         if let Some(data) = q.dequeue() {
-            println!("dequeue data: {}", data);
+            println!("deque data: {}", data);
         } else {
             println!("empty queue");
         }
