@@ -1,6 +1,6 @@
 
 #[derive(Debug)]
-struct Deque<T> {
+pub struct Deque<T> {
     cap: usize,
     data: Vec<T>,
 }
@@ -30,7 +30,7 @@ impl<T> Deque<T> {
     }
 
     // Vec 的末尾为队首
-    fn add_front(&mut self, val: T) -> Result<(), String> {
+    pub fn add_front(&mut self, val: T) -> Result<(), String> {
         if self.is_full() {
             return Err("No space available".to_string());
         }
@@ -40,7 +40,7 @@ impl<T> Deque<T> {
     }
 
     // Vec 的首部为队尾
-    fn add_rear(&mut self, val: T) -> Result<(), String> {
+    pub fn add_rear(&mut self, val: T) -> Result<(), String> {
         if self.is_full() {
             return Err("No space available".to_string())
         }
@@ -50,7 +50,7 @@ impl<T> Deque<T> {
     }
 
     // 从队首移除数据
-    fn remove_front(&mut self) -> Option<T> {
+    pub fn remove_front(&mut self) -> Option<T> {
         if self.len() > 0 {
             return self.data.pop();
         }
@@ -58,7 +58,7 @@ impl<T> Deque<T> {
     }
 
     // 从队尾移除数据
-    fn remove_rear(&mut self) -> Option<T> {
+    pub fn remove_rear(&mut self) -> Option<T> {
         if self.len() > 0 {
             return Some(self.data.remove(0));
         }
@@ -90,7 +90,7 @@ impl<T> Deque<T> {
     }
 }
 
-struct IntoIter<T>(Deque<T>);
+pub struct IntoIter<T>(Deque<T>);
 impl<T> Iterator for IntoIter<T> {
     type Item = T;
 
@@ -102,7 +102,7 @@ impl<T> Iterator for IntoIter<T> {
     }
 }
 
-struct Iter<'a, T> {
+pub struct Iter<'a, T> {
     data: Vec<&'a T>
 }
 impl<'a, T> Iterator for Iter<'a, T> {
@@ -116,7 +116,7 @@ impl<'a, T> Iterator for Iter<'a, T> {
     }
 }
 
-struct IterMut<'a, T> {
+pub struct IterMut<'a, T> {
     data: Vec<&'a mut T>
 }
 impl<'a, T> Iterator for IterMut<'a, T> {
