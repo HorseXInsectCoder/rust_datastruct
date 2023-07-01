@@ -66,7 +66,10 @@ impl<T> Deque<T> {
     }
 
     pub fn into_iter(self) -> IntoIter<T> {
-        IntoIter(self)
+        // IntoIter(self)
+        IntoIter {
+            deque: Deque { cap: self.cap, data: self.data }
+        }
     }
 
     pub fn iter(&self) -> Iter<T> {
@@ -90,13 +93,26 @@ impl<T> Deque<T> {
     }
 }
 
-pub struct IntoIter<T>(Deque<T>);
+// pub struct IntoIter<T>(Deque<T>);
+pub struct IntoIter<T> {
+    deque: Deque<T>
+}
+// impl<T> Iterator for IntoIter<T> {
+//     type Item = T;
+//
+//     fn next(&mut self) -> Option<Self::Item> {
+//         if !self.0.is_empty() {
+//             return Some(self.0.data.remove(0));
+//         }
+//         None
+//     }
+// }
 impl<T> Iterator for IntoIter<T> {
     type Item = T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if !self.0.is_empty() {
-            return Some(self.0.data.remove(0));
+        if !self.deque.is_empty() {
+            return Some(self.deque.data.remove(0));
         }
         None
     }
