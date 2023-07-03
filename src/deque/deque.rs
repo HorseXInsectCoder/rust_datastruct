@@ -73,12 +73,16 @@ impl<T> Deque<T> {
     }
 
     pub fn iter(&self) -> Iter<T> {
+        // let mut iterator = Iter {
+        //     data: vec![]
+        // };
+        // for item in self.data.iter() {
+        //     iterator.data.push(item);
+        // }
         let mut iterator = Iter {
-            data: vec![]
+            // data: self.data.iter().map(|item| item).collect()
+            data: self.data.iter().collect()
         };
-        for item in self.data.iter() {
-            iterator.data.push(item);
-        }
         iterator
     }
 
