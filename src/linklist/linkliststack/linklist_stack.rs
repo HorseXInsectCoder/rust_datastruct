@@ -149,4 +149,23 @@ mod tests {
         s.clear();
         println!("{:?}", s);
     }
+
+    #[test]
+    fn iter() {
+        let mut s = LStack::new();
+        s.push(1);
+        s.push(2);
+        s.push(3);
+
+        let sum1 = s.iter().sum::<i32>();
+        let mut addend = 0;
+        for item in s.iter_mut() {
+            *item += 1;
+            addend += 1;
+        }
+        let sum2 = s.iter().sum::<i32>();
+        println!("{sum1} + {addend} = {sum2}");
+
+        assert_eq!(9, s.into_iter().sum::<i32>());
+    }
 }
