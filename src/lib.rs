@@ -5,3 +5,4 @@ pub mod linklist;
 pub mod vec;
 pub mod recursion;
 mod dp;
+mod bin_search;
