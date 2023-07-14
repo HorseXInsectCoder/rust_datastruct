@@ -6,3 +6,5 @@ pub mod vec;
 pub mod recursion;
 mod dp;
 mod bin_search;
+mod hash_search;
+mod sort;
