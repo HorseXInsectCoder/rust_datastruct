@@ -1,7 +1,7 @@
 
 // 拆分
-fn merge_sort<T: Ord + Copy>(nums: &mut [T])  {
-// fn merge_sort(nums: &mut [i32])  {
+// fn merge_sort<T: Ord + Copy>(nums: &mut [T])  {
+fn merge_sort(nums: &mut [i32])  {
     if nums.len() > 1 {
         let mid = nums.len() >> 1;
         merge_sort(&mut nums[..mid]);
@@ -34,11 +34,11 @@ fn merge<T: Ord + Copy>(nums: &mut [T], mid: usize) {
     }
 
     // 合并剩余数据，合并的两部分数据大概率长度不一样，因此需要将集合中未处理完的数据全部加入
-    if i < mid && k == nums.len() {
+    if i < mid && k == nums.len() {     // 右边已加完
         for j in i..mid {
             temp.push(nums[j]);
         }
-    } else if i == mid && k < nums.len() {
+    } else if i == mid && k < nums.len() {  // 左边已加完
         for j in k..nums.len() {
             temp.push(nums[j]);
         }
@@ -49,6 +49,7 @@ fn merge<T: Ord + Copy>(nums: &mut [T], mid: usize) {
         nums[i] = temp[i];
     }
 }
+
 
 #[cfg(test)]
 mod tests {
