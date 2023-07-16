@@ -16,7 +16,7 @@ impl<T: Clone + Ord + ToString + Debug> BinaryTree<T> {
         Self {
             key,
             left: None,
-            right: None
+            right: None,
         }
     }
 
@@ -49,7 +49,6 @@ impl<T: Clone + Ord + ToString + Debug> BinaryTree<T> {
     }
 
     fn calc_size(&self, mut size: usize) -> usize {
-
         size += 1;
 
         if !self.left.is_none() {
@@ -201,14 +200,14 @@ impl<T: Clone + Ord + ToString + Debug> BinaryTree<T> {
             match front.get_left() {
                 Some(node) => {
                     let _r = q.enqueue(node);
-                },
-                None => {},
+                }
+                None => {}
             }
             match front.get_right() {
                 Some(node) => {
                     let _r = q.enqueue(node);
-                },
-                None => {},
+                }
+                None => {}
             }
         }
     }
@@ -285,6 +284,5 @@ mod tests {
         bt.postorder();
         bt.levelorder();
         println!("outside pre-in-post-level order");
-
     }
 }
