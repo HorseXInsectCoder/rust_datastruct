@@ -23,7 +23,7 @@ fn merge<T: Ord + Copy>(nums: &mut [T], mid: usize) {
         }
 
         // 将数据放到临时集合temp中
-        // 比较两个部分，更小的放到temp
+        // 比较两个部分，更小的先放到temp
         if nums[i] < nums[k] {
             temp.push(nums[i]);
             i += 1;
