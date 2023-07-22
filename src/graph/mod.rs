@@ -1,2 +1,3 @@
-mod adj_maxtrix;
+mod adj_matrix;
 mod error;
+mod adj_list;
