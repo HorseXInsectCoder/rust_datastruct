@@ -2,17 +2,18 @@ use std::cmp::{max, Ordering};
 use std::fmt::Debug;
 use crate::queue::queue::Queue;
 
-type Link<T, U> = Option<Box<BST<T, U>>>;
+type Link<T, U> = Option<Box<AVLTree<T, U>>>;
 
 #[derive(Debug, Clone)]
-struct BST<T, U> {
+struct AVLTree<T, U> {
     key: Option<T>,
     val: Option<U>,
     left: Link<T, U>,
     right: Link<T, U>,
+    height: isize
 }
 
-impl<T, U> BST<T, U>
+impl<T, U> AVLTree<T, U>
     where T: Copy + Ord + Debug,
           U: Copy + Debug,
 {
@@ -22,8 +23,23 @@ impl<T, U> BST<T, U>
             val: None,
             left: None,
             right: None,
+            height: 1,
         }
     }
+
+    // 获取节点的高度
+    fn get_height(&self) -> isize {
+        self.height
+    }
+
+    // 获得节点的平衡因子
+    fn get_balance_factor(&self) -> isize {
+        // self.left.clone().unwrap().get_height() - self.right.clone().unwrap().get_height()
+        todo!()
+    }
+
+
+
 
     fn is_empty(&self) -> bool {
         self.key.is_none()
@@ -70,17 +86,6 @@ impl<T, U> BST<T, U>
         if let Some(node) = &self.right {
             right_leaf_size += node.leaf_size()
         };
-
-
-        // let left_leaf_size = match &self.left {
-        //     Some(node) => node.leaf_size(),
-        //     None => 0,
-        // };
-        //
-        // let right_leaf_size = match &self.right {
-        //     Some(node) => node.leaf_size(),
-        //     None => 0,
-        // };
 
         left_leaf_size + right_leaf_size
     }
@@ -139,10 +144,20 @@ impl<T, U> BST<T, U>
                         },
                         // 直到没有子节点，新增一个叶子节点
                         None => {
-                            let mut node = BST::new();
+                            let mut node = AVLTree::new();
                             node.insert(key, val);
                             // 把新节点挂到原来的节点下面
                             *child = Some(Box::new(node));
+
+                            // 更新height
+                            self.height = 1 + self.get_height();
+
+                            // 计算平衡因子
+                            let balance_factor = self.get_balance_factor();
+                            println!("balance_factor: {:?}", balance_factor);
+                            if balance_factor.abs() > 1 {
+                                println!("不是平衡二叉树");
+                            }
                         }
                     }
                 },
@@ -174,10 +189,10 @@ impl<T, U> BST<T, U>
         }
     }
 
-    fn min(&self) -> (Option<&T>, Option<&U>) {
+    fn min_val(&self) -> (Option<&T>, Option<&U>) {
         // 最小值一定在左边
         match &self.left {
-            Some(node) => node.min(),
+            Some(node) => node.min_val(),
             // 来到叶子节点
             None => match &self.key {
                 // Some(key) => (Some(&key), self.val.as_ref()),
@@ -187,10 +202,10 @@ impl<T, U> BST<T, U>
         }
     }
 
-    fn max(&self) -> (Option<&T>, Option<&U>) {
+    fn max_val(&self) -> (Option<&T>, Option<&U>) {
         // 最大值一定在右边
         match &self.right {
-            Some(node) => node.max(),
+            Some(node) => node.max_val(),
             None => {
                 match &self.key {
                     Some(key) => (self.key.as_ref(), self.val.as_ref()),
@@ -294,38 +309,38 @@ impl<T, U> BST<T, U>
     }
 }
 
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn basic_test() {
-        let mut bst = BST::new();
+        let mut bst = AVLTree::new();
         println!("bst depth: {}", bst.depth());
         println!("bst: {:?}", bst);
 
+        bst.insert(12, 'q');
         bst.insert(8, 'e');
-        bst.insert(6, 'c');
+        bst.insert(18, 'h');
+        bst.insert(5, 'c');
+        bst.insert(11, 'f');
+        bst.insert(17, 'f');
+        bst.insert(4, 'b');
+        bst.insert(2, 'a');
         bst.insert(7, 'd');
-        bst.insert(5, 'b');
-        bst.insert(10, 'g');
-        bst.insert(9, 'f');
-        bst.insert(11, 'h');
-        bst.insert(4, 'a');
 
-        bst.insert(20, 'x');
-        bst.insert(18, 'y');
-        bst.insert(21, 'z');
-
-
+        println!("get_balance_factor: {}", bst.get_balance_factor());
         println!("bst is empty: {:?}", bst.is_empty());
         println!("bst size: {}", bst.size());
         println!("bst leaves: {}", bst.leaf_size());
         println!("bst internals: {}", bst.none_leaf_size());
         println!("bst depth: {}", bst.depth());
+        println!("bst height: {}", bst.get_height());
 
-        let min_kv = bst.min();
-        let max_kv = bst.max();
+        let min_kv = bst.min_val();
+        let max_kv = bst.max_val();
         println!("min key-val: {:?}-{:?}", min_kv.0, min_kv.1);
         println!("max key-val: {:?}-{:?}", max_kv.0, max_kv.1);
 
@@ -339,31 +354,26 @@ mod tests {
 
     #[test]
     fn order() {
-        let mut bst = BST::new();
-        // bst.insert(8, 'e');
-        // bst.insert(6, 'c');
-        // bst.insert(7, 'd');
-        // bst.insert(5, 'b');
-        // bst.insert(10, 'g');
-        // bst.insert(9, 'f');
-        // bst.insert(11, 'h');
-        // bst.insert(4, 'a');
-
-        bst.insert(2, 'a');
-        bst.insert(7, 'd');
-        bst.insert(5, 'c');
-        bst.insert(4, 'b');
-        bst.insert(17, 'f');
+        let mut bst = AVLTree::new();
+        bst.insert(12, 'q');
         bst.insert(8, 'e');
         bst.insert(18, 'h');
-        bst.insert(12, 'q');
+        bst.insert(5, 'c');
         bst.insert(11, 'f');
+        bst.insert(17, 'f');
+        bst.insert(4, 'b');
+        bst.insert(2, 'a');
+        bst.insert(7, 'd');
+
+        // bst.insert(8, 'e'); bst.insert(6,'c');
+        // bst.insert(7, 'd'); bst.insert(5,'b');
+        // bst.insert(10,'g'); bst.insert(9,'f');
+        // bst.insert(11,'h'); bst.insert(4,'a');
 
         println!("--- internal inorder, preorder, postorder ---");
         // bst.inorder();
         println!("-----");
         bst.preorder();
-        println!("{:?}", bst);
         // println!("-----");
         // bst.postorder();
         // println!("-----");

@@ -4,7 +4,7 @@ use crate::queue::queue::Queue;
 
 type Link<T, U> = Option<Box<BST<T, U>>>;
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 struct BST<T, U> {
     key: Option<T>,
     val: Option<U>,
@@ -13,20 +13,20 @@ struct BST<T, U> {
 }
 
 impl<T, U> BST<T, U>
-    where T: Copy + Ord + Debug,
-          U: Copy + Debug,
+    where T: Copy + Debug + Ord,
+          U: Copy + Debug
 {
     fn new() -> Self {
         Self {
             key: None,
             val: None,
             left: None,
-            right: None,
+            right: None
         }
     }
 
     fn is_empty(&self) -> bool {
-        self.key.is_none()
+        self.size() == 0
     }
 
     fn size(&self) -> usize {
@@ -38,110 +38,83 @@ impl<T, U> BST<T, U>
             return size;
         }
 
-        // 将当前节点数加入总节点数（根节点）
         size += 1;
 
-        // 分别计算左、右节点数
         if self.left.is_some() {
             size = self.left.as_ref().unwrap().calc_size(size);
         }
 
-        if self.right.is_some() {
+        // if self.right.is_some() {
+        //     size = self.right.as_ref().unwrap().calc_size(size);
+        // }
+        if let Some(_) = self.right {
             size = self.right.as_ref().unwrap().calc_size(size);
         }
 
         size
     }
 
-    // 计算叶子节点个数
     fn leaf_size(&self) -> usize {
-        // 左右孩子都为空，当前节点就是叶节点，返回 1
         if self.left.is_none() && self.right.is_none() {
             return 1;
         }
 
-        // 计算左、右子树的叶节点数
-        let mut left_leaf_size = 0;
-        if let Some(node) = &self.left {
-            left_leaf_size += node.leaf_size()
+        let left_leaf = match &self.left {
+            Some(left) => left.leaf_size(),
+            None => 0,
+        };
+        let right_leaf = match &self.right {
+            Some(right) => right.leaf_size(),
+            None => 0,
         };
 
-        let mut right_leaf_size = 0;
-        if let Some(node) = &self.right {
-            right_leaf_size += node.leaf_size()
-        };
-
-
-        // let left_leaf_size = match &self.left {
-        //     Some(node) => node.leaf_size(),
-        //     None => 0,
-        // };
-        //
-        // let right_leaf_size = match &self.right {
-        //     Some(node) => node.leaf_size(),
-        //     None => 0,
-        // };
-
-        left_leaf_size + right_leaf_size
+        left_leaf + right_leaf
     }
 
-    // 非叶子节点的个数
     fn none_leaf_size(&self) -> usize {
         self.size() - self.leaf_size()
     }
 
-    // 计算树的深度
     fn depth(&self) -> usize {
-        // 只要创建了空的树，深度就至少为 1
-
         let mut left_depth = 1;
+
         if let Some(left) = &self.left {
             left_depth += left.depth();
         }
 
         let mut right_depth = 1;
         if let Some(right) = &self.right {
-            right_depth += right.depth();
+            right_depth = right.depth();
         }
 
         max(left_depth, right_depth)
     }
 
-    // 插入节点
     fn insert(&mut self, key: T, val: U) {
-        // 需要从根节点往下找
-        // 没有数据时，直接插入
         if self.key.is_none() {
             self.key = Some(key);
             self.val = Some(val);
         } else {
             match &self.key {
-                // 存在key，更新val
                 Some(k) => {
                     if key == *k {
                         self.val = Some(val);
                         return;
                     }
 
-                    // 未找到相同的 key，需要插入新节点
-                    // 先找到需要插入的子树
                     let child = if key < *k {
                         &mut self.left
                     } else {
                         &mut self.right
                     };
 
-                    // 根据节点递归下去，直到插入为止
                     match child {
-                        // 存在子节点，继续递归往下走
                         Some(ref mut node) => {
-                            node.insert(key, val);
+                            node.insert(key, val)
                         },
-                        // 直到没有子节点，新增一个叶子节点
                         None => {
                             let mut node = BST::new();
                             node.insert(key, val);
-                            // 把新节点挂到原来的节点下面
                             *child = Some(Box::new(node));
                         }
                     }
@@ -163,7 +136,7 @@ impl<T, U> BST<T, U>
                             None => false,
                         }
                     }
-                    Ordering::Greater => {      // 去左子树找
+                    Ordering::Greater => {
                         match &self.left {
                             Some(node) => node.contains(key),
                             None => false,
@@ -175,27 +148,23 @@ impl<T, U> BST<T, U>
     }
 
     fn min(&self) -> (Option<&T>, Option<&U>) {
-        // 最小值一定在左边
         match &self.left {
-            Some(node) => node.min(),
-            // 来到叶子节点
+            Some(node) => {
+                node.min()
+            },
             None => match &self.key {
-                // Some(key) => (Some(&key), self.val.as_ref()),
-                Some(_) => (self.key.as_ref(), self.val.as_ref()),
+                Some(key) => (Some(&key), self.val.as_ref()),
                 None => (None, None),
             }
         }
     }
 
     fn max(&self) -> (Option<&T>, Option<&U>) {
-        // 最大值一定在右边
         match &self.right {
             Some(node) => node.max(),
-            None => {
-                match &self.key {
-                    Some(key) => (self.key.as_ref(), self.val.as_ref()),
-                    None => (None, None),
-                }
+            None => match &self.key {
+                Some(key) => (Some(&key), self.val.as_ref()),
+                None => (None, None)
             }
         }
     }
@@ -208,27 +177,26 @@ impl<T, U> BST<T, U>
         self.right.clone()
     }
 
-    // 获取值引用
     fn get(&self, key: &T) -> Option<&U> {
-        match &self.key {
-            None => None,
+        match self.key {
             Some(k) => {
                 match k.cmp(key) {
                     Ordering::Equal => self.val.as_ref(),
                     Ordering::Less => {
                         match &self.right {
-                            None => None,
                             Some(node) => node.get(key),
+                            None => None,
                         }
                     }
                     Ordering::Greater => {
                         match &self.left {
-                            None => None,
                             Some(node) => node.get(key),
+                            None => None
                         }
                     }
                 }
-            }
+            },
+            None => None
         }
     }
 
@@ -236,59 +204,65 @@ impl<T, U> BST<T, U>
         println!("key: {:?}, val: {:?}", self.key, self.val);
         match &self.left {
             Some(node) => node.preorder(),
-            None => ()
+            None => (),
         }
+
         match &self.right {
             Some(node) => node.preorder(),
-            None => ()
+            None => (),
         }
     }
 
     fn inorder(&self) {
+
         match &self.left {
             Some(node) => node.inorder(),
-            None => ()
+            None => (),
         }
         println!("key: {:?}, val: {:?}", self.key, self.val);
+
         match &self.right {
             Some(node) => node.inorder(),
-            None => ()
+            None => (),
         }
     }
 
     fn postorder(&self) {
+
         match &self.left {
             Some(node) => node.postorder(),
-            None => ()
+            None => (),
         }
 
         match &self.right {
             Some(node) => node.postorder(),
-            None => ()
+            None => (),
         }
         println!("key: {:?}, val: {:?}", self.key, self.val);
     }
 
     fn levelorder(&self) {
-        let size = self.size();
+        let mut size = self.size();
         let mut q = Queue::new(size);
 
-        let _r = q.enqueue(Box::new(self.clone()));
+        let _ = q.enqueue(Box::new(self.clone()));
+
         while !q.is_empty() {
             let front = q.dequeue().unwrap();
             println!("key: {:?}, val: {:?}", front.key, front.val);
 
             match front.get_left() {
-                Some(left) => {
-                    let _ = q.enqueue(left);
+                Some(node) => {
+                    let _ = q.enqueue(node);
                 },
-                None => (),
+                None => ()
             }
+
             match front.get_right() {
-                Some(right) => {
-                    let _ = q.enqueue(right);
+                Some(node) => {
+                    let _ = q.enqueue(node);
                 },
-                None => (),
+                None => ()
             }
         }
     }
@@ -350,24 +324,23 @@ mod tests {
         // bst.insert(4, 'a');
 
         bst.insert(2, 'a');
-        bst.insert(7, 'd');
-        bst.insert(5, 'c');
         bst.insert(4, 'b');
-        bst.insert(17, 'f');
+        bst.insert(5, 'c');
+        bst.insert(7, 'd');
         bst.insert(8, 'e');
+        bst.insert(11, 'f');
+        bst.insert(17, 'f');
         bst.insert(18, 'h');
         bst.insert(12, 'q');
-        bst.insert(11, 'f');
 
-        println!("--- internal inorder, preorder, postorder ---");
+        // println!("--- internal inorder, preorder, postorder ---");
         // bst.inorder();
-        println!("-----");
+        // println!("-----");
         bst.preorder();
-        println!("{:?}", bst);
         // println!("-----");
         // bst.postorder();
         // println!("-----");
         // bst.levelorder();
-        println!("outside inorder, preorder, postorder");
+        // println!("outside inorder, preorder, postorder");
     }
 }
