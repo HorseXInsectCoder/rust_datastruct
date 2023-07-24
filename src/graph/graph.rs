@@ -39,9 +39,9 @@ impl Graph {
                     let linklist_vec: Vec<BTreeSet<usize>> = (0..v).map(|_| BTreeSet::new()).collect();
                     self.read_second2end(&content, linklist_vec).unwrap_or_default()
                 })
-                .and_then(|adj| self.print_adj(adj.clone()).map(|_| adj))
+                // .and_then(|adj| self.print_adj(adj.clone()).map(|_| adj))
                 .map(|adj| {
-                    println!("print success!");
+                    // println!("print success!");
                     self.adj = adj.clone();
                     adj
                 }).ok()

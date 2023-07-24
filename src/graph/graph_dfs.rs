@@ -33,7 +33,13 @@ impl GraphDFS {
     }
 
     fn process(&mut self) {
-        self.dfs(0);
+        // self.dfs(0);
+
+        for v in 0..self.graph.borrow().v {
+            if !self.visited.borrow_mut()[v] {
+                self.dfs(v);
+            }
+        }
     }
 
     fn order(&self) -> Vec<usize> {
@@ -67,7 +73,6 @@ mod tests {
         let mut dfs = GraphDFS::new();
 
         dfs.process();
-        println!("{:?}", dfs);
 
         println!("{:?}", dfs.order());
     }
