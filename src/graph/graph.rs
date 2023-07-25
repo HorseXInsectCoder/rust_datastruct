@@ -44,7 +44,7 @@ impl Graph {
                 .map(|adj| {
                     // println!("print success!");
                     self.adj = adj.clone();
-                    println!("{:?}", adj);
+                    // println!("{:?}", adj);
                     adj
                 }).ok()
         } else {

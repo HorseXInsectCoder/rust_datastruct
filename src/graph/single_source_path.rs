@@ -24,10 +24,8 @@ impl SingleSourcePath {
         // 校验传进来的顶点源 s
         let _ = graph.validate_vertex(s);
 
-        let v = vec![false; graph.v];
-
         Self {
-            visited: RefCell::new(v),
+            visited: RefCell::new(vec![false; graph.v]),
             order: RefCell::new(vec![]),
             graph: RefCell::new(graph.clone()),
             s,
@@ -66,7 +64,7 @@ impl SingleSourcePath {
 
         self.pre.borrow_mut()[v] = parent as i32;
         for w in g.adj(v) {
-            if !self.visited.borrow_mut()[*w] {
+            if !self.visited.borrow()[*w] {
                 self.dfs(*w, v);
             }
         }
@@ -91,10 +89,11 @@ impl SingleSourcePath {
         let mut cur = t;
         while cur != self.s {
             res.push(cur);
-            cur = self.pre.borrow_mut()[cur] as usize;
+            cur = self.pre.borrow()[cur] as usize;
         }
         res.push(self.s);
 
+        // 反转数组，由于是倒查，所以要反转符合用户看的习惯
         res.reverse();
         res
     }
@@ -111,8 +110,12 @@ mod tests {
 
         ss.process();
 
-        println!("{:?}", ss.order());
+        // println!("{:?}", ss.order());
         println!("0 -> 6: {:?}", ss.path(6));
         println!("0 -> 5: {:?}", ss.path(5));
+        println!("0 -> 4: {:?}", ss.path(4));
+        println!("0 -> 3: {:?}", ss.path(3));
+        println!("0 -> 2: {:?}", ss.path(2));
+        println!("0 -> 1: {:?}", ss.path(1));
     }
 }
