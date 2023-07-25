@@ -1,10 +1,11 @@
-use std::fs::File;
-use std::{fs, io, usize};
+
 use std::collections::BTreeSet;
-use std::io::{BufRead, BufReader, ErrorKind, Read, Write};
-use std::path::Path;
+use std::{fs, io};
+use std::io::Write;
 use std::str::FromStr;
-use crate::graph::error::{MatrixError::*, MatrixError, Result};
+use crate::graph::error::MatrixError::{InvalidVertexEdge, ParallelEdge, PrintMatrixError, ReadFileError, SelfLoop, VertexError};
+use crate::graph::error::Result;
+
 
 #[derive(Debug, Clone)]
 pub struct Graph {
@@ -43,6 +44,7 @@ impl Graph {
                 .map(|adj| {
                     // println!("print success!");
                     self.adj = adj.clone();
+                    println!("{:?}", adj);
                     adj
                 }).ok()
         } else {
