@@ -21,9 +21,10 @@ struct Path {
 impl Path {
     // 传入单源的顶点
     fn new(s: usize, t: usize) -> Self {
-        let mut graph = Graph::new("g.txt");
+        let file_path = "g.txt";
+        let mut graph = Graph::new(file_path);
 
-        Graph::init_matrix(&mut graph);
+        Graph::init_matrix(&mut graph, file_path);
 
         // 校验传进来的顶点源 s
         let _ = graph.validate_vertex(s);
@@ -139,5 +140,9 @@ mod tests {
         let mut path = Path::new(0, 5);
         path.process();
         println!("0 -> 5: {:?}", path.path());
+
+        let mut path = Path::new(1, 6);
+        path.process();
+        println!("1 -> 6: {:?}", path.path());
     }
 }

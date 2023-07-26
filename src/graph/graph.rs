@@ -33,8 +33,8 @@ impl Graph {
         }
     }
 
-    pub fn init_matrix(&mut self) -> Option<Vec<BTreeSet<usize>>> {
-        if let Ok(content) = Graph::read_file("g.txt") {
+    pub fn init_matrix(&mut self, file_path: &str) -> Option<Vec<BTreeSet<usize>>> {
+        if let Ok(content) = Graph::read_file(file_path) {
             Graph::read_v_e(&content)
                 .map(|(v, e)| {
                     let linklist_vec: Vec<BTreeSet<usize>> = (0..v).map(|_| BTreeSet::new()).collect();
@@ -171,7 +171,7 @@ mod tests {
     #[test]
     fn basic_test() {
         let mut graph = Graph::new("g.txt");
-        let g = graph.init_matrix().unwrap();
+        let g = graph.init_matrix("g.txt").unwrap();
         println!("--------");
         // println!("{:?}", al.v);
         // println!("{:?}", al.e);

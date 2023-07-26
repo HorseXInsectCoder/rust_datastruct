@@ -13,9 +13,10 @@ struct CC {
 
 impl CC {
     fn new() -> Self {
-        let mut graph = Graph::new("g.txt");
+        let file_path = "g.txt";
+        let mut graph = Graph::new(file_path);
 
-        Graph::init_matrix(&mut graph);
+        Graph::init_matrix(&mut graph, file_path);
 
         // 把 visited 数组初始化为 -1
         let v = vec![-1; graph.v];

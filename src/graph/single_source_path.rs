@@ -17,9 +17,10 @@ struct SingleSourcePath {
 impl SingleSourcePath {
     // 传入单源的顶点
     fn new(s: usize) -> Self {
-        let mut graph = Graph::new("g.txt");
+        let file_path = "g.txt";
+        let mut graph = Graph::new(file_path);
 
-        Graph::init_matrix(&mut graph);
+        Graph::init_matrix(&mut graph, file_path);
 
         // 校验传进来的顶点源 s
         let _ = graph.validate_vertex(s);
