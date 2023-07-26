@@ -14,8 +14,7 @@ struct CC {
 impl CC {
     fn new() -> Self {
         let file_path = "g.txt";
-        let mut graph = Graph::new(file_path);
-
+        let mut graph = Graph::new();
         Graph::init_matrix(&mut graph, file_path);
 
         // 把 visited 数组初始化为 -1

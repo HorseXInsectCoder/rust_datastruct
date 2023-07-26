@@ -15,8 +15,7 @@ struct GraphDFS {
 impl GraphDFS {
     fn new() -> Self {
         let file_path = "g.txt";
-        let mut graph = Graph::new(file_path);
-
+        let mut graph = Graph::new();
         Graph::init_matrix(&mut graph, file_path);
 
         let v = vec![false; graph.v];

@@ -11,8 +11,7 @@ struct CycleDetection {
 
 impl CycleDetection {
     fn new(file_path: &str) -> Self {
-        // let file_path = "g_no_cycle.txt";
-        let mut graph = Graph::new(file_path);
+        let mut graph = Graph::new();
 
         Graph::init_matrix(&mut graph, file_path);
 

@@ -1,6 +1,5 @@
-
 use std::collections::BTreeSet;
-use std::{fs, io};
+use std::{fs, io, usize};
 use std::io::Write;
 use std::str::FromStr;
 use crate::graph::error::MatrixError::{InvalidVertexEdge, ParallelEdge, PrintMatrixError, ReadFileError, SelfLoop, VertexError};
@@ -16,41 +15,19 @@ pub struct Graph {
 
 impl Graph {
     // 读取文件
-    pub fn new(file_path: &str) -> Self {
-        let mut v = 0;
-        let mut e = 0;
-        if let Ok(content) = Graph::read_file(file_path) {
-            if let Ok((vertex, edge)) = Graph::read_v_e(&content) {
-                v = vertex;
-                e = edge;
-            }
-        };
-
+    pub fn new() -> Self {
         Self {
-            v,
-            e,
+            v: 0,
+            e: 0,
             adj: Default::default()
         }
     }
 
-    pub fn init_matrix(&mut self, file_path: &str) -> Option<Vec<BTreeSet<usize>>> {
-        if let Ok(content) = Graph::read_file(file_path) {
-            Graph::read_v_e(&content)
-                .map(|(v, e)| {
-                    let linklist_vec: Vec<BTreeSet<usize>> = (0..v).map(|_| BTreeSet::new()).collect();
-                    self.read_second2end(&content, linklist_vec).unwrap_or_default()
-                })
-                // .and_then(|adj| self.print_adj(adj.clone()).map(|_| adj))
-                .map(|adj| {
-                    // println!("print success!");
-                    self.adj = adj.clone();
-                    // println!("{:?}", adj);
-                    adj
-                }).ok()
-        } else {
-            eprintln!("Error reading file");
-            None
-        }
+    pub fn init_matrix(&mut self, file_path: &str)  {
+        let _ = Graph::read_file(file_path)
+            .map(|content| {
+                self.read_data(&content).unwrap_or_default()
+            });
     }
 
 
@@ -63,11 +40,41 @@ impl Graph {
         Ok(())
     }
 
-    pub fn read_second2end(&self, content: &String, mut adj: Vec<BTreeSet<usize>>) -> Result<Vec<BTreeSet<usize>>> {
+
+    pub fn read_file(file_path: &str) -> Result<String> {
+        let contents = fs::read_to_string(file_path)
+            .map_err(|_| ReadFileError)
+            .and_then(|s| Ok::<String, _>(s.trim().to_owned()))?;
+
+        Ok(contents)
+    }
+
+    // 只读取第一行，(顶点，边数)
+    pub fn read_data<S: AsRef<str>>(&mut self, s: S) -> Result<(usize, usize, Vec<BTreeSet<usize>>)> {
+        let s = s.as_ref();
+        let mut v = 0;
+        let mut e = 0;
+
+        if let Some(line) = s.lines().next() {
+            let mut iter = line.split_whitespace();
+            v = usize::from_str(iter.next().unwrap_or_default()).unwrap_or_default();
+            e = usize::from_str(iter.next().unwrap_or_default()).unwrap_or_default();
+        }
+
+        if v <= 0 {
+            return Err(VertexError);
+        }
+
+        self.v = v;
+        self.e = e;
+
+        let mut adj: Vec<BTreeSet<usize>> = (0..v).map(|_| BTreeSet::new()).collect();
+
+        // 读取第一行后面的数据
         let mut num1 = 0;
         let mut num2 = 0;
         // 从第二行开始读取，并赋值给二维数组
-        let mut s = content.lines().skip(1);
+        let mut s =  s.lines().skip(1);
         while let Some(line) = s.next() {
             let mut iter = line.split_whitespace();
             num1 = usize::from_str(iter.next().unwrap_or_default()).unwrap_or_default();
@@ -77,7 +84,6 @@ impl Graph {
             if adj[num1].contains(&num2) {
                 return Err(ParallelEdge);
             }
-
 
             // 遇到自环边
             if num1 == num2 {
@@ -89,37 +95,11 @@ impl Graph {
                 adj[num2].insert(num1);
             }
         }
-        Ok(adj)
-    }
+
+        self.adj = adj.clone();
 
 
-    pub fn read_file(file_path: &str) -> Result<String> {
-        let contents = fs::read_to_string(file_path)
-            // .map_err(|e| e.into())
-            // .and_then(|s| Ok::<String, io::Error>(s.trim().to_owned()))?;
-            .map_err(|_| ReadFileError)
-            .and_then(|s| Ok::<String, _>(s.trim().to_owned()))?;
-
-        Ok(contents)
-    }
-
-    // 只读取第一行，(顶点，边数)
-    pub fn read_v_e<S: AsRef<str>>(s: S) -> Result<(usize, usize)> {
-        let s = s.as_ref();
-        let mut v = 0;
-        let mut e = 0;
-
-        if let Some(line) = s.lines().next() {
-            let mut iter = line.split_whitespace();
-            v = i32::from_str(iter.next().unwrap_or_default()).unwrap_or_default();
-            e = i32::from_str(iter.next().unwrap_or_default()).unwrap_or_default();
-        }
-
-        if v <= 0 {
-            return Err(VertexError);
-        }
-
-        Ok((v as usize, e as usize))
+        Ok((v as usize, e as usize, adj))
     }
 
     pub fn print_adj(&self, mut adj: Vec<BTreeSet<usize>>) -> Result<()> {
@@ -170,11 +150,11 @@ mod tests {
 
     #[test]
     fn basic_test() {
-        let mut graph = Graph::new("g.txt");
-        let g = graph.init_matrix("g.txt").unwrap();
-        println!("--------");
-        // println!("{:?}", al.v);
-        // println!("{:?}", al.e);
-        println!("{:?}", g);
+        let mut graph = Graph::new();
+        graph.init_matrix("g_test.txt");
+
+        println!("{:?}", graph.v);
+        println!("{:?}", graph.e);
+        println!("{:?}", graph.adj);
     }
 }
