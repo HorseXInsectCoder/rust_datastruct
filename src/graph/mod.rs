@@ -10,3 +10,4 @@ mod single_source_path;
 mod path;
 mod cycle_detection;
 mod graph_test;
+mod bi_partition_detection;
