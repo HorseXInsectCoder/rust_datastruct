@@ -40,6 +40,7 @@ impl BiPartitionDetection {
         }
     }
 
+    // 是什么颜色不重要，重要的是能把颜色染成不一样
     fn dfs(&self, v: usize, color: i32) -> bool {
         self.visited.borrow_mut()[v] = true;
         self.colors.borrow_mut()[v] = color;
@@ -48,8 +49,8 @@ impl BiPartitionDetection {
         for w in g.adj(v) {
             // 之前没有被访问，就要进行染色
             if !self.visited.borrow_mut()[*w] {
-                // 取反，如果 v 的颜色是0，那么 w 就是1，反过来，如果 v 是 0，w 就是 1
-                // 如果不是二分图就不用继续检测了，直接返回false
+                // 给相邻顶点染色。取反操作，如果 v 的颜色是0，那么 w 就是1，反过来，如果 v 是 0，w 就是 1
+                // 只要检测到不是二分图就不用继续检测了，直接返回false
                 if !self.dfs(*w, 1 - color) {
                     return false;
                 }
